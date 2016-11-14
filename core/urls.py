@@ -1,5 +1,5 @@
 from rest_framework import routers
-from .views import RecipeViewSet, RecipeDetailViewSet, ShoppingListViewSet
+from .views import RecipeDetailViewSet, ShoppingListViewSet
 
 router = routers.DefaultRouter()
 router.register(r'recipes', RecipeDetailViewSet)

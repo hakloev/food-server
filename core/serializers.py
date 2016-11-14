@@ -79,4 +79,3 @@ class ShoppingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('ingredient', 'total_amount')
-        # fields = ('total_amount', )

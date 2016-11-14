@@ -1,8 +1,8 @@
-from django.db.models import Count, Sum
+from django.db.models import Sum
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from .models import Recipe, RecipeIngredient, Ingredient
+from .models import Recipe, RecipeIngredient
 from .serializers import RecipeSerializer, RecipeDetailSerializer, ShoppingListSerializer
 
 
@@ -24,10 +24,3 @@ class ShoppingListViewSet(viewsets.ViewSet):
         )
         serializer = ShoppingListSerializer(queryset, many=True)
         return Response(serializer.data)
-
-    # def get_queryset(self):
-    #     queryset = RecipeIngredient.objects.values('ingredient').annotate(
-    #         total_amount=Sum('amount')
-    #     )
-    #     return queryset
-
