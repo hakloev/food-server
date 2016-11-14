@@ -1,9 +1,9 @@
 from django.db.models import Sum
-from rest_framework import viewsets
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
 
-from .models import Recipe, RecipeIngredient
-from .serializers import RecipeSerializer, RecipeDetailSerializer, ShoppingListSerializer
+from .models import Recipe, RecipeIngredient, Plan
+from .serializers import RecipeSerializer, RecipeDetailSerializer, ShoppingListSerializer, PlanSerializer
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -24,3 +24,8 @@ class ShoppingListViewSet(viewsets.ViewSet):
         )
         serializer = ShoppingListSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class PlanViewSet(viewsets.ModelViewSet):
+    serializer_class = PlanSerializer
+    queryset = Plan.objects.all()

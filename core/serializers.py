@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Recipe, RecipeIngredient, RecipeStep, Ingredient
+from .models import Recipe, RecipeIngredient, RecipeStep, Ingredient, Plan, PlanItem
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -79,3 +79,19 @@ class ShoppingListSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('ingredient', 'total_amount')
+
+
+class PlanItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PlanItem
+        depth = 2
+        fields = ('day', 'recipe', 'eaten')
+
+
+class PlanSerializer(serializers.ModelSerializer):
+    days = PlanItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Plan
+        fields = ('start_date', 'end_date', 'cost', 'days')
