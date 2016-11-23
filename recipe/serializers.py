@@ -13,7 +13,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = ('id', 'name', 'website', 'type')
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -82,6 +82,7 @@ class ShoppingListSerializer(serializers.ModelSerializer):
 
 
 class PlanItemSerializer(serializers.ModelSerializer):
+    recipe = RecipeSerializer(read_only=False)
 
     class Meta:
         model = PlanItem
@@ -90,8 +91,8 @@ class PlanItemSerializer(serializers.ModelSerializer):
 
 
 class PlanSerializer(serializers.ModelSerializer):
-    days = PlanItemSerializer(many=True, read_only=True)
+    days = PlanItemSerializer(many=True, read_only=False)
 
     class Meta:
         model = Plan
-        fields = ('start_date', 'end_date', 'cost', 'days')
+        fields = ('id', 'start_date', 'end_date', 'cost', 'days')

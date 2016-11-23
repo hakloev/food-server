@@ -7,6 +7,12 @@ RECIPE_TYPES = (
     ('S', 'Svin'),
 )
 
+INGREDIENT_UNITS = (
+    ('G', 'g'),
+    ('K', 'kg'),
+    ('S', 'skje')
+)
+
 # Define possible days
 MONDAY = 0
 TUESDAY = 1
@@ -59,7 +65,7 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe)
     ingredient = models.ForeignKey(Ingredient)
     amount = models.FloatField()
-    unit = models.CharField(max_length=100)
+    unit = models.CharField(max_length=2, choices=INGREDIENT_UNITS)
     preparation = models.TextField()
 
     def __str__(self):
