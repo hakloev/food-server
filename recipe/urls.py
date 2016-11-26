@@ -1,7 +1,10 @@
 from django.conf.urls import url
 
 from rest_framework import routers
-from .views import RecipeDetailViewSet, ShoppingListViewSet, PlanViewSet, RecipeCreateView, RecipeEditView, RecipeDetailView
+from .views import (RecipeDetailViewSet,
+                    ShoppingListViewSet,
+                    PlanViewSet,
+                    LatestPlanView)
 
 
 router = routers.DefaultRouter()
@@ -11,8 +14,7 @@ router.register(r'plan', PlanViewSet, base_name='plan')
 
 
 urlpatterns = [
-    url(r'^create/$', RecipeCreateView.as_view(), name='recipe_create'),
-    url(r'^edit/(?P<pk>[0-9]+)/$', RecipeEditView.as_view(), name='recipe_edit'),
-    url(r'^detail/(?P<pk>[0-9]+)/$', RecipeDetailView.as_view(), name='recipe_detail'),
-    # url(r'^api/$', router.urls(), name='api'),
+    url(r'plan/latest/$', LatestPlanView.as_view({ 'get': 'latest' }), name='plan_latest'),
 ]
+
+urlpatterns += router.urls

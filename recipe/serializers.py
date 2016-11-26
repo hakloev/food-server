@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Recipe, RecipeIngredient, RecipeStep, Ingredient, Plan, PlanItem
+from .models import (Recipe,
+                     RecipeIngredient,
+                     RecipeStep,
+                     Ingredient,
+                     Plan,
+                     PlanItem)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -18,6 +23,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source='ingredient.name')
+    unit = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_unit(obj):
+        return obj.get_unit_display()
 
     class Meta:
         model = RecipeIngredient
@@ -32,8 +42,12 @@ class RecipeStepSerializer(serializers.ModelSerializer):
 
 
 class RecipeDetailSerializer(serializers.ModelSerializer):
+    """
+    Used to serialize recipes for /api/recipes/:id
+    """
     ingredients = serializers.SerializerMethodField()
     steps = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     @staticmethod
     def get_ingredients(obj):
@@ -52,6 +66,10 @@ class RecipeDetailSerializer(serializers.ModelSerializer):
             return serializer.data
         else:
             return []
+
+    @staticmethod
+    def get_type(obj):
+        return obj.get_type_display()
 
     class Meta:
         model = Recipe
