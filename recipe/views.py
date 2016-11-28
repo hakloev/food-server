@@ -1,23 +1,124 @@
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 
-from .models import Recipe, RecipeIngredient, Plan
+from .models import Recipe, RecipeIngredient, RecipeStep, Plan, Ingredient
 from .serializers import (RecipeSerializer,
-                          RecipeDetailSerializer,
                           ShoppingListSerializer,
-                          PlanSerializer)
+                          PlanSerializer,
+                          IngredientSerializer,
+                          RecipeStepSerializer,
+                          RecipeIngredientSerializer)
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeList(generics.ListAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
 
-class RecipeDetailViewSet(viewsets.ModelViewSet):
+class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeDetailSerializer
+    serializer_class = RecipeSerializer
+
+
+class RecipeStepList(generics.ListCreateAPIView):
+    model = RecipeStep
+    serializer_class = RecipeStepSerializer
+
+    def get_queryset(self):
+        """
+        Returns a list of all steps for a given recipe
+        """
+        return RecipeStep.objects.filter(recipe=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        recipe = Recipe.objects.get(pk=self.kwargs['pk'])
+        serializer.save(recipe=recipe)
+
+
+class RecipeStepDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = RecipeStep
+    serializer_class = RecipeStepSerializer
+
+    def get_queryset(self):
+        """
+        Returns a step in a recipe
+        """
+        return RecipeStep.objects.filter(
+            step_number=self.kwargs['step_number'],
+            recipe=self.kwargs['pk']
+        )
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset)
+        return obj
+
+
+class RecipeIngredientList(generics.ListCreateAPIView):
+    model = RecipeIngredient
+    serializer_class = RecipeIngredientSerializer
+
+    def get_queryset(self):
+        """
+        Returns a list of all ingredients for a recipe
+        """
+        return RecipeIngredient.objects.filter(recipe=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        recipe = Recipe.objects.get(pk=self.kwargs[pk])
+        serializer.save(recipe=recipe)
+
+
+class RecipeIngredientDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = RecipeIngredient
+    serializer_class = RecipeIngredientSerializer
+
+    def get_queryset(self):
+        """
+        This view should return an ingredient for a recipe
+        """
+        ingredient_id = self.kwargs['ingredient_pk']
+        return RecipeIngredient.objects.filter(pk=ingredient_id)
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset)
+        return obj
+
+
+# class RecipeDetailViewSet(viewsets.ViewSet):
+#     queryset = Recipe.objects.all()
+#     serializer_class = RecipeDetailSerializer
+#
+#     def list(self, request):
+#         recipes = Recipe.objects.all()
+#         serializer = RecipeDetailSerializer(recipes, many=True)
+#         return Response(serializer.data)
+#
+#     def retrieve(self, request, pk=None):
+#         queryset = Recipe.objects.all()
+#         recipe = get_object_or_404(queryset, pk=pk)
+#         serializer = RecipeDetailSerializer(recipe)
+#         return Response(serializer.data)
+#
+#     def create(self, request):
+#         print(request.data)
+#         serializer = RecipeDetailSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             print('valid', serializer.data)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             print('errors', serializer.errors)
+#         return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IngredientViewSet(viewsets.ModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
 
 
 class ShoppingListViewSet(viewsets.ViewSet):

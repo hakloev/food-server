@@ -35,7 +35,7 @@ WEEKDAYS = (
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=500)
+    name = models.CharField(max_length=500, unique=True)
     website = models.URLField(blank=True, null=True)
     type = models.CharField(max_length=1, choices=RECIPE_TYPES)
 
@@ -44,7 +44,7 @@ class Recipe(models.Model):
 
 
 class RecipeStep(models.Model):
-    recipe = models.ForeignKey(Recipe)
+    recipe = models.ForeignKey(Recipe, related_name='steps', on_delete=models.CASCADE)
     step_number = models.IntegerField()
     description = models.TextField()
 
@@ -56,18 +56,22 @@ class RecipeStep(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=400)
+    name = models.CharField(max_length=400, unique=True)
 
     def __str__(self):
         return self.name
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe)
+    recipe = models.ForeignKey(Recipe, related_name='ingredients', on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient)
     amount = models.FloatField()
     unit = models.CharField(max_length=2, choices=INGREDIENT_UNITS)
     preparation = models.CharField(max_length=200, default="")
+
+    @property
+    def unit_display(self):
+        return self.get_unit_display()
 
     def __str__(self):
         return '{} til {}'.format(self.ingredient, self.recipe)

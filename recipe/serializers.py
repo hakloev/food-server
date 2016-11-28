@@ -14,66 +14,35 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class RecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'website', 'type')
-
-
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    name = serializers.ReadOnlyField(source='ingredient.name')
-    unit = serializers.SerializerMethodField()
+    ingredient = IngredientSerializer(read_only=True)
 
-    @staticmethod
-    def get_unit(obj):
-        return obj.get_unit_display()
+    # TODO: Create and update here
 
     class Meta:
         model = RecipeIngredient
-        exclude = ('recipe', 'ingredient')
+        exclude = ('recipe',)
 
 
 class RecipeStepSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RecipeStep
-        exclude = ('recipe', )
+        exclude = ('recipe',)
+
+        # TODO: Create and update here
 
 
-class RecipeDetailSerializer(serializers.ModelSerializer):
-    """
-    Used to serialize recipes for /api/recipes/:id
-    """
-    ingredients = serializers.SerializerMethodField()
-    steps = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_ingredients(obj):
-        recipe_ingredients = RecipeIngredient.objects.filter(recipe=obj.pk)
-        if recipe_ingredients:
-            serializer = RecipeIngredientSerializer(recipe_ingredients, many=True)
-            return serializer.data
-        else:
-            return []
-
-    @staticmethod
-    def get_steps(obj):
-        recipe_steps = RecipeStep.objects.filter(recipe=obj.pk)
-        if recipe_steps:
-            serializer = RecipeStepSerializer(recipe_steps, many=True)
-            return serializer.data
-        else:
-            return []
-
-    @staticmethod
-    def get_type(obj):
-        return obj.get_type_display()
+class RecipeSerializer(serializers.ModelSerializer):
+    ingredients = RecipeIngredientSerializer(many=True, read_only=True)
+    steps = RecipeStepSerializer(many=True, read_only=True)
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        fields = ('id', 'name', 'website', 'type', 'ingredients', 'steps')
+        depth = 1
+
+
+#############
 
 
 class IngredientField(serializers.Field):
