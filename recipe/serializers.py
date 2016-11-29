@@ -15,7 +15,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    ingredient = IngredientSerializer(read_only=True)
+    ingredient = IngredientSerializer(read_only=True) # Will only show on GET
+    ingredient_id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(), source='ingredient', write_only=True,
+    )  # Will only be required on POST
 
     # TODO: Create and update here
 

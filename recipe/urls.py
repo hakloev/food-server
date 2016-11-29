@@ -3,7 +3,7 @@ from django.conf.urls import url
 from rest_framework import routers
 from .views import (# ShoppingListViewSet,
                     # PlanViewSet,
-                    # IngredientViewSet,
+                    IngredientViewSet,
                     RecipeList,
                     RecipeDetail,
                     RecipeStepList,
@@ -14,7 +14,7 @@ from .views import (# ShoppingListViewSet,
 
 
 router = routers.DefaultRouter()
-# router.register(r'ingredients', IngredientViewSet)
+router.register(r'ingredients', IngredientViewSet)
 # router.register(r'shopping', ShoppingListViewSet, base_name='shopping')
 # router.register(r'plan', PlanViewSet, base_name='plan')
 

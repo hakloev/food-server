@@ -13,7 +13,7 @@ from .serializers import (RecipeSerializer,
                           RecipeIngredientSerializer)
 
 
-class RecipeList(generics.ListAPIView):
+class RecipeList(generics.ListCreateAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
@@ -68,7 +68,7 @@ class RecipeIngredientList(generics.ListCreateAPIView):
         return RecipeIngredient.objects.filter(recipe=self.kwargs['pk'])
 
     def perform_create(self, serializer):
-        recipe = Recipe.objects.get(pk=self.kwargs[pk])
+        recipe = Recipe.objects.get(pk=self.kwargs['pk'])
         serializer.save(recipe=recipe)
 
 
