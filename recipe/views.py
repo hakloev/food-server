@@ -45,7 +45,6 @@ class PlanItemDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         """
         """
-        print(self.kwargs)
         return PlanItem.objects.filter(
             pk=self.kwargs['item_pk'],
             plan=self.kwargs['plan_pk'],
