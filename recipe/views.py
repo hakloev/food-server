@@ -4,13 +4,57 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 
-from .models import Recipe, RecipeIngredient, RecipeStep, Plan, Ingredient
+from .models import Recipe, RecipeIngredient, RecipeStep, Plan, PlanItem, Ingredient
 from .serializers import (RecipeSerializer,
                           ShoppingListSerializer,
                           PlanSerializer,
+                          PlanItemSerializer,
                           IngredientSerializer,
                           RecipeStepSerializer,
                           RecipeIngredientSerializer)
+
+
+class PlanList(generics.ListCreateAPIView):
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
+
+
+class PlanDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
+
+
+class PlanItemList(generics.ListCreateAPIView):
+    model = PlanItem
+    serializer_class = PlanItemSerializer
+
+    def get_queryset(self):
+        """
+        """
+        return PlanItem.objects.filter(plan=self.kwargs['plan_pk'])
+
+    def perform_create(self, serializer):
+        plan = Plan.objects.get(pk=self.kwargs['plan_pk'])
+        serializer.save(plan=plan)
+
+
+class PlanItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = PlanItem
+    serializer_class = PlanItemSerializer
+
+    def get_queryset(self):
+        """
+        """
+        print(self.kwargs)
+        return PlanItem.objects.filter(
+            pk=self.kwargs['item_pk'],
+            plan=self.kwargs['plan_pk'],
+        )
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset)
+        return obj
 
 
 class RecipeList(generics.ListCreateAPIView):

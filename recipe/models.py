@@ -106,8 +106,8 @@ class PlanItem(models.Model):
     plan = models.ForeignKey(
         Plan,
         on_delete=models.CASCADE,
-        related_name='days',
-        related_query_name='day',
+        related_name='items',
+        related_query_name='item',
     )
     recipe = models.ForeignKey(
         Recipe,

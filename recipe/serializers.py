@@ -45,6 +45,25 @@ class RecipeSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class PlanItemSerializer(serializers.ModelSerializer):
+    recipe_id = serializers.PrimaryKeyRelatedField(
+        queryset=Recipe.objects.all(), source='recipe', write_only=False,
+    )
+
+    class Meta:
+        model = PlanItem
+        depth = 2
+        fields = ('id', 'day', 'recipe_id', 'eaten')
+
+
+class PlanSerializer(serializers.ModelSerializer):
+    items = PlanItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Plan
+        fields = ('id', 'start_date', 'end_date', 'cost', 'items')
+
+
 #############
 
 
@@ -70,19 +89,3 @@ class ShoppingListSerializer(serializers.ModelSerializer):
         model = RecipeIngredient
         fields = ('ingredient', 'total_amount')
 
-
-class PlanItemSerializer(serializers.ModelSerializer):
-    recipe = RecipeSerializer(read_only=False)
-
-    class Meta:
-        model = PlanItem
-        depth = 2
-        fields = ('day', 'recipe', 'eaten')
-
-
-class PlanSerializer(serializers.ModelSerializer):
-    days = PlanItemSerializer(many=True, read_only=False)
-
-    class Meta:
-        model = Plan
-        fields = ('id', 'start_date', 'end_date', 'cost', 'days')

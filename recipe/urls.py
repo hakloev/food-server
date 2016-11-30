@@ -10,6 +10,10 @@ from .views import (# ShoppingListViewSet,
                     RecipeStepDetail,
                     RecipeIngredientList,
                     RecipeIngredientDetail,
+                    PlanList,
+                    PlanDetail,
+                    PlanItemList,
+                    PlanItemDetail,
                     LatestPlanView)
 
 
@@ -29,6 +33,12 @@ urlpatterns = [
 
     url(r'^recipes/(?P<pk>[0-9]+)/ingredients/$', RecipeIngredientList.as_view()),
     url(r'^recipes/(?P<pk>[0-9]+)/ingredients/(?P<ingredient_pk>[0-9]+)/$', RecipeIngredientDetail.as_view()),
+
+    url(r'^plans/$', PlanList.as_view()),
+    url(r'^plans/(?P<pk>[0-9]+)/$', PlanDetail.as_view()),
+
+    url(r'^plans/(?P<plan_pk>[0-9]+)/items/$', PlanItemList.as_view()),
+    url(r'^plans/(?P<plan_pk>[0-9]+)/items/(?P<item_pk>[0-9]+)', PlanItemDetail.as_view()),
 
     url(r'plan/latest/$', LatestPlanView.as_view({ 'get': 'latest' }), name='plan_latest'),
 ]
