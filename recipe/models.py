@@ -1,4 +1,8 @@
+import uuid
 from django.db import models
+from django.db.models import Max
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from .utils import calculate_week_ends_for_date, get_week_from_date
 
 RECIPE_TYPES = (
@@ -35,7 +39,7 @@ WEEKDAYS = (
 
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=500, unique=True)
+    name = models.CharField(max_length=500, unique=True, blank=False)
     website = models.URLField(blank=True, null=True)
     type = models.CharField(max_length=1, choices=RECIPE_TYPES)
 
@@ -45,7 +49,7 @@ class Recipe(models.Model):
 
 class RecipeStep(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='steps', on_delete=models.CASCADE)
-    step_number = models.IntegerField()
+    step_number = models.IntegerField(default=0)
     description = models.TextField()
 
     def __str__(self):
@@ -53,6 +57,14 @@ class RecipeStep(models.Model):
 
     class Meta:
         ordering = ['step_number']
+
+
+@receiver(post_save, sender=RecipeStep, dispatch_uid=uuid.uuid1())
+def update_step_number(sender, instance, created, **kwargs):
+    if created and instance.step_number == 0:
+        max_step = RecipeStep.objects.filter(recipe=instance.recipe).aggregate(Max('step_number'))['step_number__max']
+        instance.step_number = max_step + 1
+        instance.save()
 
 
 class Ingredient(models.Model):
@@ -102,6 +114,13 @@ class Plan(models.Model):
         ordering = ['-end_date']
 
 
+@receiver(post_save, sender=Plan, dispatch_uid=uuid.uuid1())
+def create_plan_items(sender, instance, created, **kwargs):
+    if created:
+        for dayId, name in WEEKDAYS:
+            PlanItem.objects.create(plan=instance, day=dayId)
+
+
 class PlanItem(models.Model):
     plan = models.ForeignKey(
         Plan,
@@ -111,12 +130,14 @@ class PlanItem(models.Model):
     )
     recipe = models.ForeignKey(
         Recipe,
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
         related_name='recipes',
         related_query_name='recipe',
     )
 
-    day = models.PositiveSmallIntegerField(choices=WEEKDAYS)
+    day = models.PositiveSmallIntegerField(choices=WEEKDAYS, editable=False)
     eaten = models.BooleanField(default=False)
 
     class Meta:
